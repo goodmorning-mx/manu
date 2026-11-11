@@ -23,10 +23,14 @@ services:
   backend:
     build: ./backend
     environment:
-      APP_NAME: ${APP_NAME:-GoodMorning MVP Template API}
+      APP_NAME: ${APP_NAME:-Manu Reviews API}
       APP_ENV: ${APP_ENV:-local}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8080}
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://goodmorning:goodmorning_local_password@postgres:5432/goodmorning_mvp}
+      AUTH_SECRET: ${AUTH_SECRET:-local-manu-auth-secret-change-me-2026}
+      ORGANIZATION_ID: ${ORGANIZATION_ID:-manu}
+      JUDGEME_SHOP_DOMAIN: ${JUDGEME_SHOP_DOMAIN:-}
+      JUDGEME_API_TOKEN: ${JUDGEME_API_TOKEN:-}
     # Local development port mapping only; public Coolify URLs must not include ports.
     ports:
       - "8000:8000"

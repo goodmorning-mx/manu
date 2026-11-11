@@ -4,13 +4,14 @@ from alembic import context
 from sqlalchemy import create_engine, pool
 
 from app.config import get_settings
+from gm_auth.models import metadata as auth_metadata
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = None
+target_metadata = auth_metadata
 
 
 def get_database_url() -> str:
