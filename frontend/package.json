@@ -1,5 +1,5 @@
 {
-  "name": "goodmorning-mvp-template-frontend",
+  "name": "manu-reviews-frontend",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,11 +10,12 @@
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@goodmorning/gm-auth": "https://github.com/goodmorning-mx/gm-auth/archive/138d66cb44a94781e0d38d8afd1be2dbf718c294.tar.gz",
     "@vitejs/plugin-react": "5.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "typescript": "5.8.3",
-    "vite": "7.3.6"
+    "vite": "7.3.8"
   },
   "devDependencies": {
     "@types/react": "19.1.8",

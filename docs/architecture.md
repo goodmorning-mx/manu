@@ -1,12 +1,34 @@
-# Architecture
+# Manu architecture
 
-The template contains three application surfaces:
+## MVP flow
 
-- `frontend`: a React/Vite single-page app that calls the backend health endpoint.
-- `seo`: a minimal Next.js App Router SSR surface with configurable metadata and dynamic example routes.
-- `backend`: a FastAPI API exposing `GET /health` and preparing PostgreSQL connectivity.
-- `db`: PostgreSQL for product data when a product adds its own schema.
+- The React/Vite app uses `@goodmorning/gm-auth` for email/password login.
+- FastAPI mounts `gm-auth` under `/auth`; JWT signing uses the backend-only
+  `AUTH_SECRET` setting.
+- The initial Alembic migration installs the module's SQLAlchemy tables and
+  creates the `manu` organization. Existing auth tables and user data are kept
+  during rollback.
+- `GET /reviews?published=false|true` requests one page of reviews from Judge.me.
+- `POST /reviews/{id}/publish` updates a Judge.me review to curated/visible.
+- Both review endpoints require an authenticated `admin` role. The UI only
+  displays reviewer name and review/product details, not reviewer email.
+- Manu does not duplicate review text or customer details in its PostgreSQL
+  database. Judge.me remains the source of truth.
 
-The backend currently does not create product-specific tables. Database connectivity is isolated in `backend/app/database.py` so future products can add migrations deliberately.
+The dashboard fetches up to 50 reviews per status and publishes one review per
+action. Pagination, bulk moderation, webhooks, Shopify admin OAuth, user
+management, and review editing are outside the first MVP.
 
-Runtime configuration is supplied through environment variables documented in `.env.example`.
+## Configuration
+
+Backend runtime only:
+
+- `DATABASE_URL`: Factory-managed private PostgreSQL connection.
+- `AUTH_SECRET`: generated, persistent JWT signing secret (32+ characters).
+- `JUDGEME_SHOP_DOMAIN`: Shopify domain ending in `myshopify.com`.
+- `JUDGEME_API_TOKEN`: Judge.me private API token with read/write access.
+
+Do not expose `AUTH_SECRET` or `JUDGEME_API_TOKEN` as frontend build variables.
+The initial administrator is created once by `python -m app.bootstrap_admin`
+using `MANU_ADMIN_EMAIL`, `MANU_ADMIN_PASSWORD`, and optional `MANU_ADMIN_NAME`
+in that process's environment. The script stops if any user already exists.
