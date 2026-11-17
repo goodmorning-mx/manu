@@ -1,0 +1,85 @@
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value.rating
+  assign rating_max = product.metafields.reviews.rating.value.scale_max
+  assign review_count = product.metafields.reviews.rating_count.value
+  assign has_rating = false
+  assign has_review = false
+  assign has_author = false
+  assign has_count = false
+  assign has_link = false
+
+  if rating != blank and rating_max != blank
+    assign has_rating = true
+  endif
+  if block.settings.review != blank
+    assign has_review = true
+  endif
+  if block.settings.author != blank
+    assign has_author = true
+  endif
+  if review_count != blank
+    assign has_count = true
+  endif
+  if block.settings.link_url != blank and block.settings.link_label != blank
+    assign has_link = true
+  endif
+-%}
+
+<section
+  class="manu-social-proof"
+  style="--manu-proof-background: {{ block.settings.background }}; --manu-proof-foreground: {{ block.settings.foreground }}; --manu-proof-accent: {{ block.settings.accent }};"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.heading != blank -%}
+    <h2 class="manu-social-proof__heading">{{ block.settings.heading | escape }}</h2>
+  {%- endif -%}
+
+  {%- if has_rating or has_count -%}
+    <div class="manu-social-proof__summary">
+      {%- if has_rating -%}
+        {%- assign rating_fill = rating | times: 100.0 | divided_by: rating_max -%}
+        <span class="manu-social-proof__stars" style="--manu-rating-fill: {{ rating_fill }}%;" aria-label="{{ block.settings.rating_label | escape }} {{ rating }} de {{ rating_max }}">
+          <span class="manu-social-proof__stars-empty" aria-hidden="true">★★★★★</span>
+          <span class="manu-social-proof__stars-filled" aria-hidden="true">★★★★★</span>
+        </span>
+        <span class="manu-social-proof__rating">{{ rating }} / {{ rating_max }}</span>
+      {%- endif -%}
+      {%- if has_count -%}
+        <span class="manu-social-proof__count">{{ review_count }} {{ block.settings.review_count_label | escape }}</span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if has_review -%}
+    <blockquote class="manu-social-proof__review">“{{ block.settings.review | escape }}”</blockquote>
+  {%- endif -%}
+
+  {%- if has_author -%}
+    <p class="manu-social-proof__author">{{ block.settings.author | escape }}</p>
+  {%- endif -%}
+
+  {%- if has_link -%}
+    <a class="manu-social-proof__link" href="{{ block.settings.link_url | escape }}">{{ block.settings.link_label | escape }}</a>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Social proof",
+  "target": "content",
+  "stylesheet": "social-proof.css",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Título", "default": "Lo que dicen nuestros clientes" },
+    { "type": "text", "id": "rating_label", "label": "Descripción accesible de la puntuación", "default": "Puntuación de clientes" },
+    { "type": "text", "id": "review_count_label", "label": "Texto después del número", "default": "reseñas" },
+    { "type": "textarea", "id": "review", "label": "Reseña destacada (opcional)", "info": "Usa una reseña auténtica con permiso para mostrarla." },
+    { "type": "text", "id": "author", "label": "Nombre del autor (opcional)" },
+    { "type": "text", "id": "link_label", "label": "Texto del enlace (opcional)" },
+    { "type": "url", "id": "link_url", "label": "Destino del enlace (opcional)" },
+    { "type": "color", "id": "background", "label": "Fondo", "default": "#f6f4f0" },
+    { "type": "color", "id": "foreground", "label": "Texto", "default": "#20201e" },
+    { "type": "color", "id": "accent", "label": "Acento y estrellas", "default": "#a54b32" }
+  ]
+}
+{% endschema %}
