@@ -15,16 +15,17 @@ La app `Manu Social Proof` ya está registrada en el Dev Dashboard de
 desarrollo `tienda-dev-pruebas.myshopify.com`. Su configuración local está en
 `shopify.app.toml`; sus permisos de API están vacíos. La extensión compila con
 Shopify CLI. También se creó la versión de desarrollo `manu-social-proof-2`
-sin liberarla para comercios. Está disponible en el
+con `--no-release`; aparece como inactiva y no se liberó a comercios. Está disponible en el
 [Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1227236671489).
 
 ## Pendiente para probar e instalar
 
 `shopify app dev` selecciona la tienda dev, pero Shopify pide la contraseña del
-storefront antes de iniciar el preview. El propietario puede quitar
-temporalmente esa protección en la tienda dev o introducir la contraseña cuando
-el CLI la pida en una terminal local; no enviarla por chat. La conexión del CLI
-a Shopify debe estar activa.
+storefront antes de iniciar el preview. También se confirmó que la tienda
+redirige a `/password`. El propietario puede quitar temporalmente esa protección
+en la tienda dev o introducir la contraseña cuando el CLI la pida en una
+terminal local; no enviarla por chat. La conexión del CLI a Shopify debe estar
+activa.
 
 Cuando la tienda esté accesible y el entorno tenga conexión, ejecutar desde esta
 carpeta:
