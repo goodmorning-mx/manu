@@ -34,6 +34,36 @@
   line-height: 1.4;
 }
 
+.manu-free-shipping-progress--inline {
+  width: min(100%, 900px);
+  margin-inline: auto;
+  padding: 1.25rem 1.5rem 1.4rem;
+}
+
+.manu-free-shipping-progress--inline .manu-free-shipping-progress__track {
+  height: 1.4rem;
+}
+
+.manu-free-shipping-progress--inline .manu-free-shipping-progress__message {
+  margin-top: 0.85rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+@media (max-width: 749px) {
+  .manu-free-shipping-progress--inline {
+    padding: 1rem 1.25rem 1.15rem;
+  }
+
+  .manu-free-shipping-progress--inline .manu-free-shipping-progress__track {
+    height: 1.1rem;
+  }
+
+  .manu-free-shipping-progress--inline .manu-free-shipping-progress__message {
+    font-size: 1.4rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .manu-free-shipping-progress__fill {
     transition: none;
