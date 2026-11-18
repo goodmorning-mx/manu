@@ -10,39 +10,33 @@ pedidos, no llama al backend de Manu y no altera carrito ni checkout.
 
 ## Estado de la app
 
-La app `Manu Social Proof` ya está registrada en el Dev Dashboard de
+La app `Manu Social Proof` está registrada en el Dev Dashboard de
 `goodmorning.mx`, vinculada a este proyecto y seleccionada para la tienda de
-desarrollo `tienda-dev-pruebas.myshopify.com`. Su configuración local está en
-`shopify.app.toml`; sus permisos de API están vacíos. La extensión compila con
-Shopify CLI. También se creó la versión de desarrollo `manu-social-proof-2`
-con `--no-release`; aparece como inactiva y no se liberó a comercios. Está disponible en el
+desarrollo `tienda-dev-pruebas.myshopify.com`. Sus permisos de API están vacíos.
+La extensión compila con Shopify CLI. Se creó la versión
+`manu-social-proof-2` con `--no-release`, sin publicarla a comercios. Shopify
+CLI ya instaló la app en la tienda de desarrollo y mantiene activo el preview
+local de la extensión. La versión está disponible en el
 [Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1227236671489).
 
-## Pendiente para probar e instalar
+## Probar en la tienda de desarrollo
 
-`shopify app dev` selecciona la tienda dev, pero Shopify pide la contraseña del
-storefront antes de iniciar el preview. También se confirmó que la tienda
-redirige a `/password`. El propietario puede quitar temporalmente esa protección
-en la tienda dev o introducir la contraseña cuando el CLI la pida en una
-terminal local; no enviarla por chat. La conexión del CLI a Shopify debe estar
-activa.
+El preview del CLI está activo para el tema de desarrollo
+`App Ext. Host (17bbe5-not-pc)`, ID `186859847757`. La plantilla de producto usa
+JSON y su sección principal admite bloques `@app`. El CLI usa la contraseña del
+storefront sin guardarla en el proyecto. Para conservar el preview, deja activo
+el proceso `shopify app dev`.
 
-Cuando la tienda esté accesible y el entorno tenga conexión, ejecutar desde esta
-carpeta:
+Abre el [editor del tema de desarrollo con el bloque listo para añadir](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product&addAppBlockId=10e8dcca2468623e7bd1dc083cb9b7c7%2Fsocial-proof&target=mainSection), revisa su posición en la plantilla de producto y guarda. Shopify documenta este formato de enlace profundo en la guía de [configuración de theme app extensions](https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration#deep-linking).
 
-```sh
-shopify app dev --store tienda-dev-pruebas.myshopify.com
-```
+Revisa el bloque en la vista previa con un producto que tenga los metafields de
+calificación de Judge.me. La URL de vista previa del tema es
+<https://tienda-dev-pruebas.myshopify.com/?preview_theme_id=186859847757>.
 
-Seguir el enlace de preview que muestre Shopify CLI, instalar la app de
-desarrollo en esa tienda si lo solicita y abrir el editor del tema. Añadir el
-bloque **Social proof** desde la sección **Apps** de la plantilla de producto.
-Verificarlo con un producto que tenga los metafields de calificación de Judge.me.
-
-Después de validar el preview, la app debe distribuirse a la tienda de Manu
-(por ejemplo, mediante distribución personalizada) para que él la instale. Una
-vez instalada, Manu agrega y configura el bloque desde
-**Tienda online → Temas → Personalizar → Apps**.
+Después de validar el preview, la app debe distribuirse a la tienda real de
+Manu (por ejemplo, mediante distribución personalizada) para que él la instale.
+Una vez instalada, Manu podrá añadir y configurar el bloque desde el editor de
+temas.
 
 Si la tienda usa un tema vintage, este bloque insertable puede no aparecer en
 las secciones. En ese caso se necesitaría una variante *app embed* compatible,
