@@ -24,8 +24,10 @@ versión está disponible en el
 El preview del CLI está activo para el tema de desarrollo
 `App Ext. Host (17bbe5-not-pc)`, ID `186859847757`. La plantilla de producto usa
 JSON y su sección principal admite bloques `@app`. El bloque **Social proof**
-ya está añadido y guardado una vez, debajo del título del producto. La barra debe activarse en App embeds y el bloque movible se añade desde Encabezado. Para conservar el preview
-local, deja activo el proceso `shopify app dev`.
+ya está añadido debajo del título. El embed de envío gratis está activo y la
+barra movible ya está colocada en la franja superior del encabezado. El carrito
+del tema está configurado como drawer. Para conservar el preview local, deja
+activo el proceso `shopify app dev`.
 
 Abre el [editor del tema de desarrollo](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product) para ajustar la posición o los colores. La vista previa de la tienda usa
 <https://tienda-dev-pruebas.myshopify.com/?preview_theme_id=186859847757>.
@@ -57,10 +59,21 @@ Judge.me explica la sincronización en
 
 ## Barra de envío gratis
 
-La barra tiene dos ubicaciones. Para que aparezca automáticamente dentro del
-carrito desplegable, activa el app embed **Free shipping progress** desde el
-[editor del tema](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress) y guarda. Para ponerla arriba o en otra sección compatible, abre el [editor del tema](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor), selecciona **Encabezado** y usa **Agregar bloque de aplicación → Shipping progress bar**. Puedes moverla entre las secciones que Shopify permita para bloques de apps. Shopify no permite colocarla dentro de cualquier contenedor arbitrario; la sección debe admitir bloques `@app`.
+La barra tiene dos ubicaciones y ambas ya están configuradas en el tema de
+prueba: el app embed **Free shipping progress** aparece en el carrito drawer y
+el app block **Shipping progress bar** se muestra en una franja de ancho completo
+sobre los controles del encabezado. Abre la [vista previa del tema](https://tienda-dev-pruebas.myshopify.com/?preview_theme_id=186859847757), agrega un producto y abre el carrito para ver el progreso.
 
-Configura el mínimo, texto y colores por separado en cada ubicación. El mínimo inicial es `100` en la moneda del carrito, solo como valor de demo. Ambos elementos leen el carrito mediante `GET /cart.js`, calculan el progreso con el subtotal después de descuentos y usan la moneda de presentación. No escriben en el carrito ni requieren permisos de Admin API. En el tema Dawn de desarrollo, el embed detecta el drawer; los selectores pueden ajustarse si el tema de Manu tiene otra estructura.
+En esta demo, las dos barras tienen un mínimo de `1000` en la moneda del carrito
+para que el producto de muestra de `949.95` muestre avance. Cámbialo al mínimo
+real de Manu antes de instalar en su tienda. Los textos y colores se configuran
+por separado en cada ubicación desde el
+[editor del tema](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor).
+Ambos elementos leen `GET /cart.js`, usan la moneda de presentación y no
+escriben en el carrito ni requieren permisos de Admin API. Shopify solo deja
+colocar app blocks en secciones que acepten bloques `@app`; la posición precisa
+del encabezado se ajustó en este tema de desarrollo.
 
-Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral `100` es solo el valor inicial de la demo.
+Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
+moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral
+`1000` en este tema es solo de demostración.
