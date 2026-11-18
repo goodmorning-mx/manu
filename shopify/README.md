@@ -23,15 +23,17 @@ local de la extensión. La versión está disponible en el
 
 El preview del CLI está activo para el tema de desarrollo
 `App Ext. Host (17bbe5-not-pc)`, ID `186859847757`. La plantilla de producto usa
-JSON y su sección principal admite bloques `@app`. El CLI usa la contraseña del
-storefront sin guardarla en el proyecto. Para conservar el preview, deja activo
-el proceso `shopify app dev`.
+JSON y su sección principal admite bloques `@app`. El bloque **Social proof**
+ya está añadido y guardado una vez, debajo del título del producto. Para
+conservar el preview local, deja activo el proceso `shopify app dev`.
 
-Abre el [editor del tema de desarrollo con el bloque listo para añadir](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product&addAppBlockId=10e8dcca2468623e7bd1dc083cb9b7c7%2Fsocial-proof&target=mainSection), revisa su posición en la plantilla de producto y guarda. Shopify documenta este formato de enlace profundo en la guía de [configuración de theme app extensions](https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration#deep-linking).
-
-Revisa el bloque en la vista previa con un producto que tenga los metafields de
-calificación de Judge.me. La URL de vista previa del tema es
+Abre el [editor del tema de desarrollo](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product) para ajustar la posición o los colores. La vista previa de la tienda usa
 <https://tienda-dev-pruebas.myshopify.com/?preview_theme_id=186859847757>.
+
+Para validar la puntuación y el conteo, revisa un producto que tenga los
+metafields de reseñas de Shopify (`reviews.rating` y `reviews.rating_count`).
+Si esos datos faltan, el widget los omite; agrega solo reseñas auténticas con
+permiso para mostrarlas.
 
 Después de validar el preview, la app debe distribuirse a la tienda real de
 Manu (por ejemplo, mediante distribución personalizada) para que él la instale.
