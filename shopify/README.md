@@ -14,10 +14,10 @@ La app `Manu Social Proof` está registrada en el Dev Dashboard de
 `goodmorning.mx`, vinculada a este proyecto y seleccionada para la tienda de
 desarrollo `tienda-dev-pruebas.myshopify.com`. Sus permisos de API están vacíos.
 La extensión compila con Shopify CLI. La versión
-`manu-social-proof-3` se creó con `--no-release` y no se publicó a comercios.
+`manu-social-proof-4` se creó con `--no-release` y no se publicó a comercios.
 Shopify CLI mantiene el preview local conectado a la tienda de desarrollo. La
 versión está disponible en el
-[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1235058196481).
+[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1235262570497).
 
 ## Probar en la tienda de desarrollo
 
