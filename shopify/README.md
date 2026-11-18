@@ -32,8 +32,10 @@ Abre el [editor del tema de desarrollo](https://tienda-dev-pruebas.myshopify.com
 
 Para validar la puntuación y el conteo, revisa un producto que tenga los
 metafields de reseñas de Shopify (`reviews.rating` y `reviews.rating_count`).
-Si esos datos faltan, el widget los omite; agrega solo reseñas auténticas con
-permiso para mostrarlas.
+La vista previa del producto de muestra responde HTTP 200 y carga el bloque y
+su CSS. Ese producto no tiene datos de reseñas, así que ahora muestra el
+encabezado y omite la puntuación y el conteo. Si esos datos faltan, el widget
+los omite; agrega solo reseñas auténticas con permiso para mostrarlas.
 
 Después de validar el preview, la app debe distribuirse a la tienda real de
 Manu (por ejemplo, mediante distribución personalizada) para que él la instale.
