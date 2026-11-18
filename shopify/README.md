@@ -1,31 +1,32 @@
 # Widget de Shopify para Manu
 
-Esta carpeta contiene una extensión de tema de Shopify con un bloque visual de
-reseñas de producto. El cliente podrá añadirlo, moverlo, configurarlo y
-previsualizarlo en el editor de temas. La puntuación y cantidad se leen de los
-metafields estándar de Shopify `reviews.rating` y `reviews.rating_count`, que
-Judge.me puede mantener actualizados. La cita y el autor opcionales se escriben
-manualmente; muestra solo reseñas auténticas con permiso. El bloque no consulta
-pedidos, no llama al backend de Manu y no altera carrito ni checkout.
+Esta carpeta contiene una extensión de tema de Shopify con dos elementos
+visuales: un bloque de reseñas de producto y una barra de avance para envío
+gratis en el carrito desplegable. La puntuación y cantidad de reseñas se leen de
+los metafields estándar `reviews.rating` y `reviews.rating_count`, que Judge.me
+puede mantener actualizados. La barra solo informa cuánto falta para alcanzar
+el mínimo configurado. No consulta tarifas ni cambia el carrito, checkout o
+backend de Manu.
 
 ## Estado de la app
 
 La app `Manu Social Proof` está registrada en el Dev Dashboard de
 `goodmorning.mx`, vinculada a este proyecto y seleccionada para la tienda de
 desarrollo `tienda-dev-pruebas.myshopify.com`. Sus permisos de API están vacíos.
-La extensión compila con Shopify CLI. Se creó la versión
-`manu-social-proof-2` con `--no-release`, sin publicarla a comercios. Shopify
-CLI ya instaló la app en la tienda de desarrollo y mantiene activo el preview
-local de la extensión. La versión está disponible en el
-[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1227236671489).
+La extensión compila con Shopify CLI. La versión
+`manu-social-proof-3` se creó con `--no-release` y no se publicó a comercios.
+Shopify CLI mantiene el preview local conectado a la tienda de desarrollo. La
+versión está disponible en el
+[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1235058196481).
 
 ## Probar en la tienda de desarrollo
 
 El preview del CLI está activo para el tema de desarrollo
 `App Ext. Host (17bbe5-not-pc)`, ID `186859847757`. La plantilla de producto usa
 JSON y su sección principal admite bloques `@app`. El bloque **Social proof**
-ya está añadido y guardado una vez, debajo del título del producto. Para
-conservar el preview local, deja activo el proceso `shopify app dev`.
+ya está añadido y guardado una vez, debajo del título del producto. La barra de
+envío gratis todavía debe activarse en App embeds. Para conservar el preview
+local, deja activo el proceso `shopify app dev`.
 
 Abre el [editor del tema de desarrollo](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product) para ajustar la posición o los colores. La vista previa de la tienda usa
 <https://tienda-dev-pruebas.myshopify.com/?preview_theme_id=186859847757>.
@@ -42,9 +43,8 @@ Manu (por ejemplo, mediante distribución personalizada) para que él la instale
 Una vez instalada, Manu podrá añadir y configurar el bloque desde el editor de
 temas.
 
-Si la tienda usa un tema vintage, este bloque insertable puede no aparecer en
-las secciones. En ese caso se necesitaría una variante *app embed* compatible,
-que se activa en **Configuración del tema → App embeds**.
+Si el tema de la tienda real usa otra estructura de carrito, ajusta los
+selectores del app embed en el editor del tema.
 
 ## Configuración del bloque
 
@@ -55,3 +55,38 @@ datos. Shopify documenta estos campos
 estándar en <https://shopify.dev/docs/apps/build/metafields/list-of-standard-definitions>;
 Judge.me explica la sincronización en
 <https://judge.me/help/en/articles/8394936-displaying-product-ratings-and-review-counts-with-judge-me-metafields>.
+
+## Barra de envío gratis
+
+La barra es un *app embed* para insertarse en el carrito desplegable. Para
+activarla en el tema de desarrollo, abre el [editor en App embeds](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress), activa **Free shipping progress** y guarda. Después añade un producto de prueba al carrito para ver el avance.
+
+El mínimo inicial es `100` en la moneda que muestra el carrito; ajústalo al
+umbral real de envío gratis de Manu. El porcentaje y el texto restante salen del
+mismo cálculo: subtotal de artículos después de descuentos, dividido entre el
+mínimo. La barra lee el carrito con `GET /cart.js`, usa su moneda de presentación
+y no hace escrituras ni requiere permisos de Admin API. El tema de desarrollo
+usa Dawn; si el tema de Manu usa otra estructura, los selectores CSS del carrito
+y su encabezado se pueden ajustar en la configuración del embed.
+
+Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
+moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral de
+`100` es solo el valor inicial de la demo.
+
+## Barra de envío gratis
+
+La barra se distribuye como *app embed* porque debe aparecer dentro del carrito
+desplegable del tema. Para activarla en el tema de desarrollo, abre el [editor
+en la sección App embeds](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress), activa **Free shipping progress** y guarda. Después añade un producto de prueba al carrito para ver la barra.
+
+El mínimo inicial es `100` en la moneda que muestra el carrito; ajústalo al
+umbral real de envío gratis de Manu. El porcentaje y el texto restante salen del
+mismo cálculo: subtotal de artículos después de descuentos, dividido entre el
+mínimo. La barra lee el carrito con `GET /cart.js`, usa su moneda de presentación
+y no hace escrituras ni requiere permisos de Admin API. El tema de desarrollo
+usa Dawn; los selectores del carrito y su encabezado se pueden cambiar en la
+configuración del embed si el tema de Manu usa otra estructura.
+
+Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
+moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral de
+`100` es solo el valor inicial de la demo.

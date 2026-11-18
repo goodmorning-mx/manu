@@ -1,0 +1,41 @@
+.manu-free-shipping-progress {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.25rem 1.25rem 0.85rem;
+  color: var(--manu-shipping-text, #171717);
+  background: #fff;
+  text-align: center;
+}
+
+.manu-free-shipping-progress[hidden] {
+  display: none !important;
+}
+
+.manu-free-shipping-progress__track {
+  width: 100%;
+  height: 0.625rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--manu-shipping-track, #e9e9e9);
+}
+
+.manu-free-shipping-progress__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--manu-shipping-fill, #8c2029);
+  transition: width 180ms ease;
+}
+
+.manu-free-shipping-progress__message {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manu-free-shipping-progress__fill {
+    transition: none;
+  }
+}
