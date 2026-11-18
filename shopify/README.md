@@ -24,8 +24,7 @@ versión está disponible en el
 El preview del CLI está activo para el tema de desarrollo
 `App Ext. Host (17bbe5-not-pc)`, ID `186859847757`. La plantilla de producto usa
 JSON y su sección principal admite bloques `@app`. El bloque **Social proof**
-ya está añadido y guardado una vez, debajo del título del producto. La barra de
-envío gratis todavía debe activarse en App embeds. Para conservar el preview
+ya está añadido y guardado una vez, debajo del título del producto. La barra debe activarse en App embeds y el bloque movible se añade desde Encabezado. Para conservar el preview
 local, deja activo el proceso `shopify app dev`.
 
 Abre el [editor del tema de desarrollo](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?template=product) para ajustar la posición o los colores. La vista previa de la tienda usa
@@ -58,35 +57,10 @@ Judge.me explica la sincronización en
 
 ## Barra de envío gratis
 
-La barra es un *app embed* para insertarse en el carrito desplegable. Para
-activarla en el tema de desarrollo, abre el [editor en App embeds](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress), activa **Free shipping progress** y guarda. Después añade un producto de prueba al carrito para ver el avance.
+La barra tiene dos ubicaciones. Para que aparezca automáticamente dentro del
+carrito desplegable, activa el app embed **Free shipping progress** desde el
+[editor del tema](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress) y guarda. Para ponerla arriba o en otra sección compatible, abre el [editor del tema](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor), selecciona **Encabezado** y usa **Agregar bloque de aplicación → Shipping progress bar**. Puedes moverla entre las secciones que Shopify permita para bloques de apps. Shopify no permite colocarla dentro de cualquier contenedor arbitrario; la sección debe admitir bloques `@app`.
 
-El mínimo inicial es `100` en la moneda que muestra el carrito; ajústalo al
-umbral real de envío gratis de Manu. El porcentaje y el texto restante salen del
-mismo cálculo: subtotal de artículos después de descuentos, dividido entre el
-mínimo. La barra lee el carrito con `GET /cart.js`, usa su moneda de presentación
-y no hace escrituras ni requiere permisos de Admin API. El tema de desarrollo
-usa Dawn; si el tema de Manu usa otra estructura, los selectores CSS del carrito
-y su encabezado se pueden ajustar en la configuración del embed.
+Configura el mínimo, texto y colores por separado en cada ubicación. El mínimo inicial es `100` en la moneda del carrito, solo como valor de demo. Ambos elementos leen el carrito mediante `GET /cart.js`, calculan el progreso con el subtotal después de descuentos y usan la moneda de presentación. No escriben en el carrito ni requieren permisos de Admin API. En el tema Dawn de desarrollo, el embed detecta el drawer; los selectores pueden ajustarse si el tema de Manu tiene otra estructura.
 
-Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
-moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral de
-`100` es solo el valor inicial de la demo.
-
-## Barra de envío gratis
-
-La barra se distribuye como *app embed* porque debe aparecer dentro del carrito
-desplegable del tema. Para activarla en el tema de desarrollo, abre el [editor
-en la sección App embeds](https://tienda-dev-pruebas.myshopify.com/admin/themes/186859847757/editor?context=apps&activateAppId=10e8dcca2468623e7bd1dc083cb9b7c7%2Ffree-shipping-progress), activa **Free shipping progress** y guarda. Después añade un producto de prueba al carrito para ver la barra.
-
-El mínimo inicial es `100` en la moneda que muestra el carrito; ajústalo al
-umbral real de envío gratis de Manu. El porcentaje y el texto restante salen del
-mismo cálculo: subtotal de artículos después de descuentos, dividido entre el
-mínimo. La barra lee el carrito con `GET /cart.js`, usa su moneda de presentación
-y no hace escrituras ni requiere permisos de Admin API. El tema de desarrollo
-usa Dawn; los selectores del carrito y su encabezado se pueden cambiar en la
-configuración del embed si el tema de Manu usa otra estructura.
-
-Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
-moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral de
-`100` es solo el valor inicial de la demo.
+Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral `100` es solo el valor inicial de la demo.

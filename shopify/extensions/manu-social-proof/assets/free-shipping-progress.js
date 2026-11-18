@@ -1,263 +1,145 @@
 (() => {
-  const rootSelector = '[data-manu-free-shipping-config]';
-  const defaultDrawerSelector = 'cart-drawer, [data-cart-drawer], #CartDrawer, .cart-drawer';
-  const defaultHeaderSelector = '.drawer__header, .cart-drawer__header, [data-cart-drawer-header]';
-  const cartEvents = [
-    'cart:change',
-    'cart:changed',
-    'cart:update',
-    'cart:updated',
-    'cart:refresh',
-    'cart:rendered',
-    'shopify:section:load',
-  ];
+  if (window.ManuFreeShippingProgress) return;
 
-  let root;
-  let drawerObserver;
-  let observedDrawer;
-  let pageObserver;
+  const rootSelector = '[data-manu-free-shipping-config]';
+  const defaults = {
+    drawer: 'cart-drawer, [data-cart-drawer], #CartDrawer, .cart-drawer',
+    header: '.drawer__header, .cart-drawer__header, [data-cart-drawer-header]',
+  };
   let refreshTimer;
   let requestNumber = 0;
 
-  const querySafely = (scope, selector) => {
-    if (!scope || !selector) return null;
-    try {
-      return scope.querySelector(selector);
-    } catch (_error) {
-      return null;
-    }
+  const safeQuery = (scope, selector) => {
+    try { return scope?.querySelector(selector) || null; } catch (_error) { return null; }
+  };
+  const safeClosest = (element, selector) => {
+    try { return element?.closest(selector) || null; } catch (_error) { return null; }
   };
 
-  const closestSafely = (element, selector) => {
-    if (!element || !selector) return null;
-    try {
-      return element.closest(selector);
-    } catch (_error) {
-      return null;
-    }
-  };
-
-  const getSelectors = () => ({
-    drawer: root?.dataset.cartDrawerSelector?.trim() || defaultDrawerSelector,
-    header: root?.dataset.cartHeaderSelector?.trim() || defaultHeaderSelector,
-  });
-
-  const getCartPageTarget = () => {
+  const mountCartRoot = (root) => {
+    if (root.dataset.placement !== 'cart') return;
     const path = window.location.pathname.replace(/\/+$/, '');
-    if (!/\/cart$/.test(path)) return null;
-
-    const cartForm = document.querySelector('main form[action*="/cart"]');
-    return cartForm ? { element: cartForm } : null;
-  };
-
-  const findDrawer = () => querySafely(document, getSelectors().drawer);
-
-  const mountRoot = () => {
-    if (!root) return null;
-
-    const cartPageTarget = getCartPageTarget();
-    if (cartPageTarget) {
-      if (
-        root.parentElement !== cartPageTarget.element.parentElement
-        || root.nextElementSibling !== cartPageTarget.element
-      ) {
-        cartPageTarget.element.parentElement.insertBefore(root, cartPageTarget.element);
-      }
-      return null;
-    }
-
-    const drawer = findDrawer();
-    if (!drawer) return null;
-
-    const header = querySafely(drawer, getSelectors().header);
-    if (header) {
-      if (root.previousElementSibling !== header) header.insertAdjacentElement('afterend', root);
-    } else if (root.parentElement !== drawer) {
-      drawer.insertBefore(root, drawer.firstChild);
-    }
-
-    observeDrawer(drawer);
-    return drawer;
-  };
-
-  const renderMessage = (message, amount) => {
-    const messageElement = root?.querySelector('.manu-free-shipping-progress__message');
-    if (!messageElement) return;
-
-    const rendered = amount == null ? message : message.replace('{amount}', amount);
-    const phrase = 'FREE SHIPPING';
-    const phraseIndex = rendered.toUpperCase().indexOf(phrase);
-
-    if (phraseIndex < 0) {
-      messageElement.textContent = rendered;
+    if (/\/cart$/.test(path)) {
+      const form = document.querySelector('main form[action*="/cart"]');
+      if (form?.parentElement && root.nextElementSibling !== form) form.before(root);
       return;
     }
 
-    const before = rendered.slice(0, phraseIndex);
-    const highlighted = rendered.slice(phraseIndex, phraseIndex + phrase.length);
-    const after = rendered.slice(phraseIndex + phrase.length);
-    const strong = document.createElement('strong');
-    strong.textContent = highlighted;
-    messageElement.replaceChildren(
-      document.createTextNode(before),
-      strong,
-      document.createTextNode(after),
-    );
+    const drawerSelector = root.dataset.cartDrawerSelector?.trim() || defaults.drawer;
+    const headerSelector = root.dataset.cartHeaderSelector?.trim() || defaults.header;
+    const drawer = safeQuery(document, drawerSelector);
+    if (!drawer) return;
+    const header = safeQuery(drawer, headerSelector);
+    if (header && root.previousElementSibling !== header) header.after(root);
+    else if (!header && root.parentElement !== drawer) drawer.prepend(root);
   };
 
   const formatMoney = (minorUnits, currency) => {
     const locale = document.documentElement.lang || navigator.language || 'en';
     try {
-      return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency,
-      }).format(minorUnits / 100);
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(minorUnits / 100);
     } catch (_error) {
       return `${currency} ${(minorUnits / 100).toFixed(2)}`;
     }
   };
 
-  const getQualifyingSubtotal = (cart) => {
-    const itemSubtotal = Number(cart.items_subtotal_price) || 0;
-    const cartLevelDiscount = (cart.cart_level_discount_applications || []).reduce(
-      (total, discount) => total + (Number(discount.total_allocated_amount) || 0),
-      0,
+  const subtotalAfterCartDiscounts = (cart) => {
+    const itemsSubtotal = Number(cart.items_subtotal_price) || 0;
+    const cartDiscounts = (cart.cart_level_discount_applications || []).reduce(
+      (sum, discount) => sum + (Number(discount.total_allocated_amount) || 0), 0,
     );
-    return Math.max(0, itemSubtotal - cartLevelDiscount);
+    return Math.max(0, itemsSubtotal - cartDiscounts);
   };
 
-  const renderCart = (cart) => {
-    if (!root?.isConnected) return;
+  const renderMessage = (root, message, amount) => {
+    const output = root.querySelector('.manu-free-shipping-progress__message');
+    if (!output) return;
+    const rendered = amount == null ? message : message.replace('{amount}', amount);
+    const phrase = 'FREE SHIPPING';
+    const index = rendered.toUpperCase().indexOf(phrase);
+    if (index < 0) { output.textContent = rendered; return; }
+    const strong = document.createElement('strong');
+    strong.textContent = rendered.slice(index, index + phrase.length);
+    output.replaceChildren(
+      document.createTextNode(rendered.slice(0, index)),
+      strong,
+      document.createTextNode(rendered.slice(index + phrase.length)),
+    );
+  };
 
-    const itemCount = Number(cart.item_count) || 0;
-    if (itemCount < 1) {
+  const renderRoot = (root, cart) => {
+    if (!root.isConnected) return;
+    if (root.dataset.placement === 'cart' && Number(cart.item_count) < 1) {
       root.hidden = true;
       return;
     }
-
     const threshold = Number.parseFloat(root.dataset.threshold || '100');
-    if (!Number.isFinite(threshold) || threshold < 0) {
-      root.hidden = true;
-      return;
-    }
-
-    const thresholdMinorUnits = Math.round(threshold * 100);
-    const subtotalMinorUnits = getQualifyingSubtotal(cart);
-    const remainingMinorUnits = Math.max(0, thresholdMinorUnits - subtotalMinorUnits);
-    const progress = thresholdMinorUnits === 0
-      ? 100
-      : Math.min(100, (subtotalMinorUnits / thresholdMinorUnits) * 100);
+    if (!Number.isFinite(threshold) || threshold < 0) { root.hidden = true; return; }
+    const target = Math.round(threshold * 100);
+    const subtotal = subtotalAfterCartDiscounts(cart);
+    const remaining = Math.max(0, target - subtotal);
+    const progress = target === 0 ? 100 : Math.min(100, subtotal / target * 100);
     const track = root.querySelector('.manu-free-shipping-progress__track');
     const fill = root.querySelector('.manu-free-shipping-progress__fill');
-    const currency = cart.currency || 'USD';
-
     if (track) track.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (fill) fill.style.width = `${progress}%`;
-
-    if (remainingMinorUnits > 0) {
-      renderMessage(root.dataset.messageAway || 'You are {amount} away from FREE SHIPPING!', formatMoney(remainingMinorUnits, currency));
+    if (remaining > 0) {
+      renderMessage(root, root.dataset.messageAway || 'You are {amount} away from FREE SHIPPING!', formatMoney(remaining, cart.currency || 'USD'));
     } else {
-      renderMessage(root.dataset.messageUnlocked || 'Your cart qualifies for FREE SHIPPING!');
+      renderMessage(root, root.dataset.messageUnlocked || 'Your cart qualifies for FREE SHIPPING!');
     }
-
     root.hidden = false;
   };
 
-  const refreshCart = async () => {
-    if (!root?.isConnected) return;
+  const refresh = async () => {
+    document.querySelectorAll(rootSelector).forEach(mountCartRoot);
+    if (!document.querySelector(rootSelector)) return;
     const currentRequest = ++requestNumber;
-    const routesRoot = window.Shopify?.routes?.root || '/';
-    const cartUrl = `${routesRoot.replace(/\/?$/, '/') }cart.js`;
-
+    const rootPath = window.Shopify?.routes?.root || '/';
     try {
-      const response = await fetch(cartUrl, {
-        credentials: 'same-origin',
-        headers: { Accept: 'application/json' },
+      const response = await fetch(`${rootPath.replace(/\/?$/, '/')}cart.js`, {
+        credentials: 'same-origin', headers: { Accept: 'application/json' },
       });
       if (!response.ok) return;
       const cart = await response.json();
-      if (currentRequest === requestNumber) renderCart(cart);
+      if (currentRequest !== requestNumber) return;
+      document.querySelectorAll(rootSelector).forEach((root) => renderRoot(root, cart));
     } catch (_error) {
-      // Keep the cart drawer usable when the optional progress request fails.
+      // The optional progress display must not interfere with the cart.
     }
   };
 
   const scheduleRefresh = (delay = 180) => {
     window.clearTimeout(refreshTimer);
-    refreshTimer = window.setTimeout(() => {
-      mountRoot();
-      refreshCart();
-    }, delay);
-  };
-
-  const isInsideRoot = (node) => node instanceof Node && (node === root || root?.contains(node));
-
-  const observeDrawer = (drawer) => {
-    if (drawer === observedDrawer) return;
-    drawerObserver?.disconnect();
-    observedDrawer = drawer;
-    drawerObserver = new MutationObserver((records) => {
-      const cartChanged = records.some((record) => !isInsideRoot(record.target));
-      if (cartChanged) scheduleRefresh();
-    });
-    drawerObserver.observe(drawer, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-      attributeFilter: ['class', 'open', 'aria-hidden'],
-    });
+    refreshTimer = window.setTimeout(refresh, delay);
   };
 
   const initialize = () => {
-    root = document.querySelector(rootSelector);
-    if (!root) return;
+    if (!document.querySelector(rootSelector)) return;
+    refresh();
+    new MutationObserver((records) => {
+      const newBlock = records.some((record) => [...record.addedNodes].some((node) => (
+        node instanceof Element && (node.matches(rootSelector) || node.querySelector(rootSelector))
+      )));
+      if (newBlock) scheduleRefresh(0);
+      else document.querySelectorAll(rootSelector).forEach(mountCartRoot);
+    }).observe(document.body, { childList: true, subtree: true });
 
-    mountRoot();
-    scheduleRefresh(0);
-
-    pageObserver = new MutationObserver((records) => {
-      const previousParent = root?.parentElement;
-      const wasConnected = root?.isConnected;
-      const drawer = mountRoot();
-      if (drawer) observeDrawer(drawer);
-      const cartForm = getCartPageTarget()?.element;
-      const cartPageChanged = cartForm && records.some((record) => (
-        record.target === cartForm || cartForm.contains(record.target)
-      ));
-      const rootMoved = root?.isConnected && (!wasConnected || root.parentElement !== previousParent);
-      if (cartPageChanged || rootMoved) scheduleRefresh(0);
-    });
-    pageObserver.observe(document.body, { childList: true, subtree: true });
-
-    cartEvents.forEach((eventName) => {
-      document.addEventListener(eventName, () => scheduleRefresh(), { passive: true });
-    });
-
+    ['cart:change', 'cart:changed', 'cart:update', 'cart:updated', 'cart:refresh', 'cart:rendered', 'shopify:section:load']
+      .forEach((name) => document.addEventListener(name, () => scheduleRefresh(), { passive: true }));
     document.addEventListener('change', (event) => {
-      if (
-        event.target instanceof Element
-        && (
-          closestSafely(event.target, getSelectors().drawer)
-          || closestSafely(event.target, 'form[action*="/cart"]')
-        )
-      ) {
-        scheduleRefresh(300);
-      }
+      if (event.target instanceof Element && (safeClosest(event.target, defaults.drawer) || safeClosest(event.target, 'form[action*="/cart"]'))) scheduleRefresh(300);
     }, true);
-
     document.addEventListener('click', (event) => {
       if (!(event.target instanceof Element)) return;
-      const inCart = closestSafely(event.target, getSelectors().drawer)
-        || closestSafely(event.target, 'form[action*="/cart"]');
-      const control = closestSafely(event.target, 'button, a, input, select, textarea');
-      const isCheckout = closestSafely(event.target, '[name="checkout"], [href*="/checkout"], [data-checkout]');
-      if (inCart && control && !isCheckout) scheduleRefresh(500);
+      const inCart = safeClosest(event.target, defaults.drawer) || safeClosest(event.target, 'form[action*="/cart"]');
+      const control = safeClosest(event.target, 'button, a, input, select, textarea');
+      const checkout = safeClosest(event.target, '[name="checkout"], [href*="/checkout"], [data-checkout]');
+      if (inCart && control && !checkout) scheduleRefresh(500);
     }, true);
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize, { once: true });
-  } else {
-    initialize();
-  }
+  window.ManuFreeShippingProgress = true;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
+  else initialize();
 })();
