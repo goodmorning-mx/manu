@@ -14,10 +14,10 @@ La app `Manu Social Proof` está registrada en el Dev Dashboard de
 `goodmorning.mx`, vinculada a este proyecto y seleccionada para la tienda de
 desarrollo `tienda-dev-pruebas.myshopify.com`. Sus permisos de API están vacíos.
 La extensión compila con Shopify CLI. La versión
-`manu-social-proof-4` se creó con `--no-release` y no se publicó a comercios.
+`manu-social-proof-5` se creó con `--no-release` y no se publicó a comercios.
 Shopify CLI mantiene el preview local conectado a la tienda de desarrollo. La
 versión está disponible en el
-[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1235262570497).
+[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1259428347905).
 
 ## Probar en la tienda de desarrollo
 
@@ -73,6 +73,23 @@ Ambos elementos leen `GET /cart.js`, usan la moneda de presentación y no
 escriben en el carrito ni requieren permisos de Admin API. Shopify solo deja
 colocar app blocks en secciones que acepten bloques `@app`; la posición precisa
 del encabezado se ajustó en este tema de desarrollo.
+
+### Mínimos por país
+
+Cada barra tiene un campo **Mínimos por país (JSON)**. Usa códigos ISO de dos
+letras y valores numéricos, por ejemplo `{"US": 1000, "MX": 1500}`. El código
+se toma del país activo de Shopify (`localization.country.iso_code`); si no hay
+una regla para ese país, la barra usa el mínimo general. Los montos de las
+reglas deben expresarse en la moneda de presentación del mercado activo, que es
+la moneda devuelta por `GET /cart.js`.
+
+Este dato representa el contexto de país/mercado activo, no necesariamente el
+país físico del visitante ni el destino final del pedido. Shopify Plus puede
+preseleccionar el país con geolocalización; en otros casos puede depender del
+país que el comprador eligió en la tienda. La sugerencia de geolocalización no
+es infalible. Configura también las zonas y tarifas reales en Shopify: la barra
+solo informa el mínimo y el checkout determina el envío aplicable a la dirección
+de entrega. Consulta la [localización en Liquid](https://shopify.dev/docs/api/liquid/objects/localization), la [detección de localización](https://shopify.dev/docs/storefronts/themes/markets/localization-discovery) y [monedas y países de Shopify Markets](https://shopify.dev/docs/storefronts/themes/markets/multiple-currencies-languages).
 
 Antes de instalarla en la tienda real, hay que definir los mínimos por mercado y
 moneda que use Manu y distribuir la versión de la app a esa tienda. El umbral

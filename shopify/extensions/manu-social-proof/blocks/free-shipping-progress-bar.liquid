@@ -2,7 +2,9 @@
   class="manu-free-shipping-progress manu-free-shipping-progress--inline"
   data-manu-free-shipping-config
   data-placement="inline"
+  data-country-code="{{ localization.country.iso_code | escape }}"
   data-threshold="{{ block.settings.threshold | escape }}"
+  data-country-thresholds="{{ block.settings.country_thresholds | escape }}"
   data-message-away="{{ block.settings.message_away | escape }}"
   data-message-unlocked="{{ block.settings.message_unlocked | escape }}"
   style="--manu-shipping-fill: {{ block.settings.fill_color }}; --manu-shipping-track: {{ block.settings.track_color }}; --manu-shipping-text: {{ block.settings.text_color }};"
@@ -21,8 +23,9 @@
   "stylesheet": "free-shipping-progress.css",
   "settings": [
     { "type": "text", "id": "threshold", "label": "Envío gratis desde (moneda del carrito)", "default": "100" },
-    { "type": "text", "id": "message_away", "label": "Mensaje antes del mínimo", "default": "You are {amount} away from FREE SHIPPING!", "info": "Usa {amount} donde deba aparecer el monto restante." },
-    { "type": "text", "id": "message_unlocked", "label": "Mensaje al alcanzar el mínimo", "default": "Your cart qualifies for FREE SHIPPING!" },
+    { "type": "textarea", "id": "country_thresholds", "label": "Mínimos por país (JSON)", "default": "{}", "info": "Ejemplo: {\"US\": 100, \"MX\": 1500}. Los montos deben corresponder a la moneda de presentación del mercado activo." },
+    { "type": "text", "id": "message_away", "label": "Mensaje antes del mínimo", "default": "You are {amount} away from FREE SHIPPING in {country}!", "info": "Puedes usar {amount} y {country} en el mensaje." },
+    { "type": "text", "id": "message_unlocked", "label": "Mensaje al alcanzar el mínimo", "default": "Your cart qualifies for FREE SHIPPING in {country}!" },
     { "type": "color", "id": "fill_color", "label": "Color de avance", "default": "#8c2029" },
     { "type": "color", "id": "track_color", "label": "Color de fondo de la barra", "default": "#e9e9e9" },
     { "type": "color", "id": "text_color", "label": "Color del texto", "default": "#171717" }

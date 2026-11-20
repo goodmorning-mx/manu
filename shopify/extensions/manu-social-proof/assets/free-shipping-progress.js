@@ -51,10 +51,12 @@
     return Math.max(0, itemsSubtotal - cartDiscounts);
   };
 
-  const renderMessage = (root, message, amount) => {
+  const renderMessage = (root, message, amount, country) => {
     const output = root.querySelector('.manu-free-shipping-progress__message');
     if (!output) return;
-    const rendered = amount == null ? message : message.replace('{amount}', amount);
+    const rendered = message
+      .replaceAll('{amount}', amount ?? '')
+      .replaceAll('{country}', country || '');
     const phrase = 'FREE SHIPPING';
     const index = rendered.toUpperCase().indexOf(phrase);
     if (index < 0) { output.textContent = rendered; return; }
@@ -67,13 +69,46 @@
     );
   };
 
+  const getCountryCode = (root) => (
+    root.dataset.countryCode || window.Shopify?.country || ''
+  ).trim().toUpperCase();
+
+  const getCountryLabel = (countryCode) => {
+    if (!countryCode) return 'your country';
+    const locale = document.documentElement.lang || navigator.language || 'en';
+    try {
+      return new Intl.DisplayNames([locale], { type: 'region' }).of(countryCode) || countryCode;
+    } catch (_error) {
+      return countryCode;
+    }
+  };
+
+  const getThreshold = (root, countryCode) => {
+    const fallback = Number.parseFloat(root.dataset.threshold || '100');
+    if (countryCode) {
+      try {
+        const thresholds = JSON.parse(root.dataset.countryThresholds || '{}');
+        const rawThreshold = thresholds[countryCode];
+        if (typeof rawThreshold === 'number' || (typeof rawThreshold === 'string' && rawThreshold.trim())) {
+          const countryThreshold = Number(rawThreshold);
+          if (Number.isFinite(countryThreshold) && countryThreshold >= 0) return countryThreshold;
+        }
+      } catch (_error) {
+        // An invalid optional country map falls back to the general threshold.
+      }
+    }
+    return fallback;
+  };
+
   const renderRoot = (root, cart) => {
     if (!root.isConnected) return;
     if (root.dataset.placement === 'cart' && Number(cart.item_count) < 1) {
       root.hidden = true;
       return;
     }
-    const threshold = Number.parseFloat(root.dataset.threshold || '100');
+    const countryCode = getCountryCode(root);
+    const country = getCountryLabel(countryCode);
+    const threshold = getThreshold(root, countryCode);
     if (!Number.isFinite(threshold) || threshold < 0) { root.hidden = true; return; }
     const target = Math.round(threshold * 100);
     const subtotal = subtotalAfterCartDiscounts(cart);
@@ -84,9 +119,19 @@
     if (track) track.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (fill) fill.style.width = `${progress}%`;
     if (remaining > 0) {
-      renderMessage(root, root.dataset.messageAway || 'You are {amount} away from FREE SHIPPING!', formatMoney(remaining, cart.currency || 'USD'));
+      renderMessage(
+        root,
+        root.dataset.messageAway || 'You are {amount} away from FREE SHIPPING in {country}!',
+        formatMoney(remaining, cart.currency || 'USD'),
+        country,
+      );
     } else {
-      renderMessage(root, root.dataset.messageUnlocked || 'Your cart qualifies for FREE SHIPPING!');
+      renderMessage(
+        root,
+        root.dataset.messageUnlocked || 'Your cart qualifies for FREE SHIPPING in {country}!',
+        null,
+        country,
+      );
     }
     root.hidden = false;
   };
