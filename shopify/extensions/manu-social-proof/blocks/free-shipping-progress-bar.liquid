@@ -1,0 +1,63 @@
+<div
+  class="manu-free-shipping-progress manu-free-shipping-progress--inline"
+  data-manu-free-shipping-config
+  data-placement="inline"
+  data-country-code="{{ localization.country.iso_code | escape }}"
+  data-threshold="{{ block.settings.threshold | escape }}"
+  data-country-thresholds="{{ block.settings.country_thresholds | escape }}"
+  data-message-away="{{ block.settings.message_away | escape }}"
+  data-message-unlocked="{{ block.settings.message_unlocked | escape }}"
+  style="--manu-shipping-fill: {{ block.settings.fill_color }}; --manu-shipping-track: {{ block.settings.track_color }}; --manu-shipping-text: {{ block.settings.text_color }};"
+>
+  {% assign eu_country_codes = '|AT|BE|BG|HR|CY|CZ|DK|EE|FI|FR|DE|GR|HU|IE|IT|LV|LT|LU|MT|NL|PL|PT|RO|SK|SI|ES|SE|' %}
+  {% assign has_eu_country = false %}
+  {% for country in localization.available_countries %}
+    {% assign country_marker = '|' | append: country.iso_code | append: '|' %}
+    {% if eu_country_codes contains country_marker %}
+      {% assign has_eu_country = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  <template data-manu-country-options>
+    {% if has_eu_country %}
+      <optgroup label="🇪🇺 European Union">
+        {% for country in localization.available_countries %}
+          {% assign country_marker = '|' | append: country.iso_code | append: '|' %}
+          {% if eu_country_codes contains country_marker %}
+            <option value="{{ country.iso_code | escape }}" data-country-name="{{ country.name | escape }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>{{ country.name | escape }}</option>
+          {% endif %}
+        {% endfor %}
+      </optgroup>
+    {% endif %}
+    <optgroup label="Otros países">
+    {% for country in localization.available_countries %}
+      {% assign country_marker = '|' | append: country.iso_code | append: '|' %}
+      {% unless eu_country_codes contains country_marker %}
+        <option value="{{ country.iso_code | escape }}" data-country-name="{{ country.name | escape }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>{{ country.name | escape }}</option>
+      {% endunless %}
+    {% endfor %}
+    </optgroup>
+  </template>
+  <div class="manu-free-shipping-progress__track" role="progressbar" aria-label="Free shipping progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <span class="manu-free-shipping-progress__fill"></span>
+  </div>
+  <p class="manu-free-shipping-progress__message" role="status" aria-live="polite"></p>
+</div>
+
+{% schema %}
+{
+  "name": "Shipping progress bar",
+  "target": "section",
+  "javascript": "free-shipping-progress.min.js",
+  "stylesheet": "free-shipping-progress.css",
+  "settings": [
+    { "type": "text", "id": "threshold", "label": "Envío gratis desde (moneda del carrito)", "default": "100" },
+    { "type": "textarea", "id": "country_thresholds", "label": "Mínimos por región/país (JSON)", "default": "{}", "info": "EU funciona como regla general para países de la UE; DE, NL, BE o CZ la pueden sobrescribir. Ejemplo: {\"EU\": 100, \"DE\": 120, \"NL\": 120, \"BE\": 120, \"CZ\": 1500}. Usa montos en la moneda de presentación." },
+    { "type": "text", "id": "message_away", "label": "Mensaje antes del mínimo", "default": "You are {amount} away from FREE SHIPPING in {country}!", "info": "Usa {amount} para el monto. {country} inserta el selector de país con banderas si la tienda tiene varios países activos." },
+    { "type": "text", "id": "message_unlocked", "label": "Mensaje al alcanzar el mínimo", "default": "Your cart qualifies for FREE SHIPPING in {country}!" },
+    { "type": "color", "id": "fill_color", "label": "Color de avance", "default": "#8c2029" },
+    { "type": "color", "id": "track_color", "label": "Color de fondo de la barra", "default": "#e9e9e9" },
+    { "type": "color", "id": "text_color", "label": "Color del texto", "default": "#171717" }
+  ]
+}
+{% endschema %}

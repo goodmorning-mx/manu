@@ -1,0 +1,84 @@
+.manu-social-proof {
+  box-sizing: border-box;
+  display: grid;
+  gap: 0.75rem;
+  max-width: 48rem;
+  margin: 1rem auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid color-mix(in srgb, var(--manu-proof-foreground) 12%, transparent);
+  border-radius: 0.75rem;
+  background: var(--manu-proof-background);
+  color: var(--manu-proof-foreground);
+  text-align: center;
+}
+
+.manu-social-proof__heading,
+.manu-social-proof__review,
+.manu-social-proof__author {
+  margin: 0;
+}
+
+.manu-social-proof__heading {
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.25;
+}
+
+.manu-social-proof__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem 0.65rem;
+  font-size: 0.95rem;
+}
+
+.manu-social-proof__stars {
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.manu-social-proof__stars-empty {
+  color: color-mix(in srgb, var(--manu-proof-foreground) 28%, transparent);
+}
+
+.manu-social-proof__stars-filled {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--manu-rating-fill);
+  overflow: hidden;
+  color: var(--manu-proof-accent);
+}
+
+.manu-social-proof__rating {
+  font-weight: 700;
+}
+
+.manu-social-proof__count,
+.manu-social-proof__author {
+  opacity: 0.78;
+}
+
+.manu-social-proof__review {
+  max-width: 38rem;
+  margin-inline: auto;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.manu-social-proof__link {
+  justify-self: center;
+  color: var(--manu-proof-accent);
+  text-underline-offset: 0.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .manu-social-proof__link {
+    transition: opacity 120ms ease;
+  }
+
+  .manu-social-proof__link:hover {
+    opacity: 0.75;
+  }
+}
