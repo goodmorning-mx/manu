@@ -51,24 +51,6 @@
     return Math.max(0, itemsSubtotal - cartDiscounts);
   };
 
-  const renderMessage = (root, message, amount, country) => {
-    const output = root.querySelector('.manu-free-shipping-progress__message');
-    if (!output) return;
-    const rendered = message
-      .replaceAll('{amount}', amount ?? '')
-      .replaceAll('{country}', country || '');
-    const phrase = 'FREE SHIPPING';
-    const index = rendered.toUpperCase().indexOf(phrase);
-    if (index < 0) { output.textContent = rendered; return; }
-    const strong = document.createElement('strong');
-    strong.textContent = rendered.slice(index, index + phrase.length);
-    output.replaceChildren(
-      document.createTextNode(rendered.slice(0, index)),
-      strong,
-      document.createTextNode(rendered.slice(index + phrase.length)),
-    );
-  };
-
   const getCountryCode = (root) => (
     root.dataset.countryCode || window.Shopify?.country || ''
   ).trim().toUpperCase();
@@ -81,6 +63,90 @@
     } catch (_error) {
       return countryCode;
     }
+  };
+
+  const countryFlag = (countryCode) => {
+    if (!/^[A-Z]{2}$/.test(countryCode)) return '🌐';
+    return [...countryCode]
+      .map((letter) => String.fromCodePoint(letter.charCodeAt(0) + 0x1f1a5))
+      .join('');
+  };
+
+  const submitCountryChange = (countryCode) => {
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/localization';
+    form.hidden = true;
+
+    const values = {
+      form_type: 'localization',
+      utf8: '✓',
+      _method: 'put',
+      country_code: countryCode,
+      return_to: `${window.location.pathname}${window.location.search}`,
+    };
+    Object.entries(values).forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = name;
+      input.value = value;
+      form.append(input);
+    });
+    document.body.append(form);
+    form.submit();
+  };
+
+  const createCountryControl = (root, countryCode, countryLabel) => {
+    const template = root.querySelector('template[data-manu-country-options]');
+    const options = template ? [...template.content.querySelectorAll('option')] : [];
+    if (options.length < 2) {
+      return document.createTextNode(`${countryFlag(countryCode)} ${countryLabel}`.trim());
+    }
+
+    const select = document.createElement('select');
+    select.className = 'manu-free-shipping-progress__country';
+    select.setAttribute('aria-label', 'Country for shipping estimate');
+    options.forEach((sourceOption) => {
+      const option = sourceOption.cloneNode(true);
+      const code = option.value.toUpperCase();
+      option.textContent = `${countryFlag(code)} ${option.dataset.countryName || option.textContent.trim()}`;
+      select.append(option);
+    });
+    select.value = countryCode;
+    select.addEventListener('change', () => submitCountryChange(select.value));
+    return select;
+  };
+
+  const renderMessage = (root, message, amount, countryCode, countryLabel) => {
+    const output = root.querySelector('.manu-free-shipping-progress__message');
+    if (!output) return;
+
+    const tokens = /\{amount\}|\{country\}|FREE SHIPPING/gi;
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+    let countryControlAdded = false;
+    let match;
+    while ((match = tokens.exec(message)) !== null) {
+      if (match.index > lastIndex) {
+        fragment.append(document.createTextNode(message.slice(lastIndex, match.index)));
+      }
+      const token = match[0].toLowerCase();
+      if (token === '{amount}') {
+        fragment.append(document.createTextNode(amount ?? ''));
+      } else if (token === '{country}' && !countryControlAdded) {
+        fragment.append(createCountryControl(root, countryCode, countryLabel));
+        countryControlAdded = true;
+      } else if (token === 'free shipping') {
+        const strong = document.createElement('strong');
+        strong.textContent = match[0];
+        fragment.append(strong);
+      } else {
+        fragment.append(document.createTextNode(match[0]));
+      }
+      lastIndex = tokens.lastIndex;
+    }
+    if (lastIndex < message.length) fragment.append(document.createTextNode(message.slice(lastIndex)));
+    output.replaceChildren(fragment);
   };
 
   const getThreshold = (root, countryCode) => {
@@ -123,6 +189,7 @@
         root,
         root.dataset.messageAway || 'You are {amount} away from FREE SHIPPING in {country}!',
         formatMoney(remaining, cart.currency || 'USD'),
+        countryCode,
         country,
       );
     } else {
@@ -130,6 +197,7 @@
         root,
         root.dataset.messageUnlocked || 'Your cart qualifies for FREE SHIPPING in {country}!',
         null,
+        countryCode,
         country,
       );
     }

@@ -12,6 +12,11 @@
   style="--manu-shipping-fill: {{ block.settings.fill_color }}; --manu-shipping-track: {{ block.settings.track_color }}; --manu-shipping-text: {{ block.settings.text_color }};"
   hidden
 >
+  <template data-manu-country-options>
+    {% for country in localization.available_countries %}
+      <option value="{{ country.iso_code | escape }}" data-country-name="{{ country.name | escape }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>{{ country.name | escape }}</option>
+    {% endfor %}
+  </template>
   <div
     class="manu-free-shipping-progress__track"
     role="progressbar"
@@ -29,7 +34,7 @@
 {
   "name": "Free shipping progress",
   "target": "body",
-  "javascript": "free-shipping-progress.js",
+  "javascript": "free-shipping-progress.min.js",
   "stylesheet": "free-shipping-progress.css",
   "settings": [
     {
@@ -50,7 +55,7 @@
       "id": "message_away",
       "label": "Mensaje antes del mínimo",
       "default": "You are {amount} away from FREE SHIPPING in {country}!",
-      "info": "Puedes usar {amount} y {country} en el mensaje."
+      "info": "Usa {amount} para el monto. {country} inserta el selector de país con banderas si la tienda tiene varios países activos."
     },
     {
       "type": "text",
