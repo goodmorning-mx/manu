@@ -74,6 +74,11 @@ escriben en el carrito ni requieren permisos de Admin API. Shopify solo deja
 colocar app blocks en secciones que acepten bloques `@app`; la posición precisa
 del encabezado se ajustó en este tema de desarrollo.
 
+En el tema dev las dos barras tienen cargado este mapa de demostración:
+`{"EU": 100, "DE": 120, "NL": 120, "BE": 120, "CZ": 1500}`. Son valores
+temporales para probar la herencia y las excepciones, no son la política real
+de Manu. Reemplázalos por sus umbrales antes de llevar el widget a su tienda.
+
 ### Países y mínimos para envío
 
 El selector de país está en ambas ubicaciones: la barra superior y el carrito.
@@ -89,15 +94,8 @@ general `EU` y excepciones por código ISO de país. Por ejemplo:
 específicos prevalecen sobre `EU`; para otros países de la UE se usa `EU`, y si
 no hay regla se usa el mínimo general. Los importes de cada regla deben estar
 en la moneda de presentación del mercado activo (`GET /cart.js`). Los importes
-del ejemplo son ilustrativos, no una política de envío recomendada.
-
-Este dato representa el contexto de país/mercado activo, no necesariamente el
-país físico del visitante ni el destino final del pedido. Shopify Plus puede
-preseleccionar el país con geolocalización; en otros casos puede depender del
-país que el comprador eligió en el selector. La sugerencia de geolocalización
-no es infalible. Configura también las zonas y tarifas reales en Shopify: la
-barra solo informa el mínimo y el checkout determina el envío aplicable a la
-dirección de entrega. Consulta la [localización en Liquid](https://shopify.dev/docs/api/liquid/objects/localization), la [detección de localización](https://shopify.dev/docs/storefronts/themes/markets/localization-discovery) y [monedas y países de Shopify Markets](https://shopify.dev/docs/storefronts/themes/markets/multiple-currencies-languages).
+del ejemplo son ilustrativos, no una política de envío recomendada. DE, NL y BE
+normalmente usarán el mercado EUR; CZ debe usar el importe de su moneda activa.
 
 El dato de país representa el contexto activo de la tienda, no necesariamente
 el país físico del visitante ni el destino final del pedido. Shopify Plus puede
