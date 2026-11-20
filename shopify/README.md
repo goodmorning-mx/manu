@@ -78,8 +78,11 @@ En el tema dev las dos barras tienen cargado este mapa de demostración:
 `{"EU": 100, "DE": 120, "NL": 120, "BE": 120, "CZ": 1500}`. Son valores
 temporales para probar la herencia y las excepciones, no son la política real
 de Manu. Reemplázalos por sus umbrales antes de llevar el widget a su tienda.
-La configuración de Markets de esta tienda dev solo ofrece ahora Canadá y
-Estados Unidos; agrega los países europeos desde [Settings → Markets](https://tienda-dev-pruebas.myshopify.com/admin/settings/markets) para que aparezcan en ambos selectores. Shopify CLI no incluye un comando para editar Markets.
+La configuración de Markets de esta tienda dev ahora ofrece Alemania, Canadá y
+Estados Unidos. Países Bajos, Bélgica y Chequia todavía deben habilitarse desde
+[Settings → Markets](https://tienda-dev-pruebas.myshopify.com/admin/settings/markets)
+para que aparezcan en ambos selectores. Shopify CLI no incluye un comando para
+editar Markets.
 
 ### Países y mínimos para envío
 
