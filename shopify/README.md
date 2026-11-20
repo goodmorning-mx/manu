@@ -14,10 +14,10 @@ La app `Manu Social Proof` está registrada en el Dev Dashboard de
 `goodmorning.mx`, vinculada a este proyecto y seleccionada para la tienda de
 desarrollo `tienda-dev-pruebas.myshopify.com`. Sus permisos de API están vacíos.
 La extensión compila con Shopify CLI. La versión
-`manu-social-proof-6` se creó con `--no-release` y no se publicó a comercios.
+`manu-social-proof-7` se creó con `--no-release` y no se publicó a comercios.
 Shopify CLI mantiene el preview local conectado a la tienda de desarrollo. La
 versión está disponible en el
-[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1259448434689).
+[Dev Dashboard](https://dev.shopify.com/dashboard/246659644/apps/446459576321/versions/1259455643649).
 
 ## Probar en la tienda de desarrollo
 
@@ -74,17 +74,22 @@ escriben en el carrito ni requieren permisos de Admin API. Shopify solo deja
 colocar app blocks en secciones que acepten bloques `@app`; la posición precisa
 del encabezado se ajustó en este tema de desarrollo.
 
-### Mínimos por país
+### Países y mínimos para envío
 
-Cada barra tiene un campo **Mínimos por país (JSON)**. Usa códigos ISO de dos
-letras y valores numéricos, por ejemplo `{"US": 1000, "MX": 1500}`. El token
-`{country}` del mensaje se convierte en un selector con banderas y los países
-activos de Shopify Markets. Al elegir uno, se envía el formulario de
-localización de Shopify para actualizar el mercado y la moneda antes de aplicar
-el umbral correspondiente. Si no hay regla para el país activo
-(`localization.country.iso_code`), la barra usa el mínimo general. Los montos de
-las reglas deben expresarse en la moneda de presentación del mercado activo,
-que es la moneda devuelta por `GET /cart.js`.
+El selector de país está en ambas ubicaciones: la barra superior y el carrito.
+Agrupa los países de la UE bajo 🇪🇺 **European Union** y muestra sus banderas
+nacionales, incluidas 🇩🇪 Alemania, 🇳🇱 Países Bajos, 🇧🇪 Bélgica y 🇨🇿 Chequia,
+cuando estén habilitados en Shopify Markets. Al elegir un país, se envía el
+formulario nativo de localización de Shopify para actualizar el mercado y la
+moneda antes de aplicar el umbral.
+
+En cada ubicación, el campo **Mínimos por región/país (JSON)** acepta una regla
+general `EU` y excepciones por código ISO de país. Por ejemplo:
+`{"EU": 100, "DE": 120, "NL": 120, "BE": 120, "CZ": 1500}`. Los países
+específicos prevalecen sobre `EU`; para otros países de la UE se usa `EU`, y si
+no hay regla se usa el mínimo general. Los importes de cada regla deben estar
+en la moneda de presentación del mercado activo (`GET /cart.js`). Los importes
+del ejemplo son ilustrativos, no una política de envío recomendada.
 
 Este dato representa el contexto de país/mercado activo, no necesariamente el
 país físico del visitante ni el destino final del pedido. Shopify Plus puede
@@ -93,6 +98,14 @@ país que el comprador eligió en el selector. La sugerencia de geolocalización
 no es infalible. Configura también las zonas y tarifas reales en Shopify: la
 barra solo informa el mínimo y el checkout determina el envío aplicable a la
 dirección de entrega. Consulta la [localización en Liquid](https://shopify.dev/docs/api/liquid/objects/localization), la [detección de localización](https://shopify.dev/docs/storefronts/themes/markets/localization-discovery) y [monedas y países de Shopify Markets](https://shopify.dev/docs/storefronts/themes/markets/multiple-currencies-languages).
+
+El dato de país representa el contexto activo de la tienda, no necesariamente
+el país físico del visitante ni el destino final del pedido. Shopify Plus puede
+preseleccionar el país con geolocalización; en otros casos, el comprador puede
+elegirlo en el selector. La geolocalización no es infalible. Configura también
+las zonas y tarifas reales en Shopify: la barra informa el mínimo y el checkout
+determina el envío aplicable a la dirección de entrega. Shopify documenta la
+[localización en Liquid](https://shopify.dev/docs/api/liquid/objects/localization), la [detección de localización](https://shopify.dev/docs/storefronts/themes/markets/localization-discovery) y [monedas y países de Shopify Markets](https://shopify.dev/docs/storefronts/themes/markets/multiple-currencies-languages). La [lista oficial de países de la UE](https://european-union.europa.eu/principles-countries-history/eu-countries_en) define el grupo `EU`.
 
 El código fuente legible es `assets/free-shipping-progress.js`; Shopify sirve
 `assets/free-shipping-progress.min.js` comprimido para cumplir el límite de

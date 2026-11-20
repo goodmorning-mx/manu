@@ -6,6 +6,10 @@
     drawer: 'cart-drawer, [data-cart-drawer], #CartDrawer, .cart-drawer',
     header: '.drawer__header, .cart-drawer__header, [data-cart-drawer-header]',
   };
+  const euCountries = new Set([
+    'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU',
+    'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
+  ]);
   let refreshTimer;
   let requestNumber = 0;
 
@@ -106,11 +110,22 @@
     const select = document.createElement('select');
     select.className = 'manu-free-shipping-progress__country';
     select.setAttribute('aria-label', 'Country for shipping estimate');
-    options.forEach((sourceOption) => {
-      const option = sourceOption.cloneNode(true);
-      const code = option.value.toUpperCase();
-      option.textContent = `${countryFlag(code)} ${option.dataset.countryName || option.textContent.trim()}`;
-      select.append(option);
+    [...template.content.children].forEach((sourceGroup) => {
+      if (sourceGroup.tagName !== 'OPTGROUP') {
+        const option = sourceGroup.cloneNode(true);
+        const code = option.value.toUpperCase();
+        option.textContent = `${countryFlag(code)} ${option.dataset.countryName || option.textContent.trim()}`;
+        select.append(option);
+        return;
+      }
+      const group = sourceGroup.cloneNode(false);
+      sourceGroup.querySelectorAll('option').forEach((sourceOption) => {
+        const option = sourceOption.cloneNode(true);
+        const code = option.value.toUpperCase();
+        option.textContent = `${countryFlag(code)} ${option.dataset.countryName || option.textContent.trim()}`;
+        group.append(option);
+      });
+      if (group.children.length) select.append(group);
     });
     select.value = countryCode;
     select.addEventListener('change', () => submitCountryChange(select.value));
@@ -151,17 +166,23 @@
 
   const getThreshold = (root, countryCode) => {
     const fallback = Number.parseFloat(root.dataset.threshold || '100');
-    if (countryCode) {
-      try {
-        const thresholds = JSON.parse(root.dataset.countryThresholds || '{}');
-        const rawThreshold = thresholds[countryCode];
-        if (typeof rawThreshold === 'number' || (typeof rawThreshold === 'string' && rawThreshold.trim())) {
-          const countryThreshold = Number(rawThreshold);
-          if (Number.isFinite(countryThreshold) && countryThreshold >= 0) return countryThreshold;
-        }
-      } catch (_error) {
-        // An invalid optional country map falls back to the general threshold.
+    if (!countryCode) return fallback;
+    try {
+      const thresholds = JSON.parse(root.dataset.countryThresholds || '{}');
+      const readThreshold = (key) => {
+        const rawThreshold = thresholds[key];
+        if (typeof rawThreshold !== 'number' && !(typeof rawThreshold === 'string' && rawThreshold.trim())) return null;
+        const value = Number(rawThreshold);
+        return Number.isFinite(value) && value >= 0 ? value : null;
+      };
+      const countryThreshold = readThreshold(countryCode);
+      if (countryThreshold != null) return countryThreshold;
+      if (euCountries.has(countryCode)) {
+        const euThreshold = readThreshold('EU');
+        if (euThreshold != null) return euThreshold;
       }
+    } catch (_error) {
+      // An invalid optional country map falls back to the general threshold.
     }
     return fallback;
   };
